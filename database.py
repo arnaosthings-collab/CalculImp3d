@@ -167,6 +167,7 @@ def init_db() -> None:
     cout_electrique REAL DEFAULT 0,
     cout_emballage REAL DEFAULT 0,
     cout_divers REAL DEFAULT 0,
+    cout_fournitures REAL DEFAULT 0,
     cout_main_oeuvre REAL DEFAULT 0,
     cout_total_ht REAL DEFAULT 0,
     prix_plancher_ht REAL DEFAULT 0,
@@ -183,6 +184,9 @@ def init_db() -> None:
     object_columns = [row["name"] for row in cur.execute("PRAGMA table_info(objets_imprimes)").fetchall()]
     if "donnees_json" not in object_columns:
         cur.execute("ALTER TABLE objets_imprimes ADD COLUMN donnees_json TEXT")
+        conn.commit()
+    if "cout_fournitures" not in object_columns:
+        cur.execute("ALTER TABLE objets_imprimes ADD COLUMN cout_fournitures REAL DEFAULT 0")
         conn.commit()
     cur.execute("""
     -- Composition multicolore (1:N)
@@ -271,16 +275,17 @@ def add_printed_object(name: str, notes: str, data: dict) -> int:
             """INSERT INTO objets_imprimes (
                 nom, imprimante_id, module_filament_id, poids_total_g,
                 temps_impression_h, temps_finition_h, cout_filament_base,
-                cout_machine, cout_electrique, cout_emballage, cout_divers,
+                cout_machine, cout_electrique, cout_emballage, cout_divers, cout_fournitures,
                 cout_main_oeuvre, cout_total_ht, prix_plancher_ht,
                 prix_conseille_ht, prix_conseille_ttc, notes, donnees_json
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 name.strip(), data.get("imprimante_id"), data.get("module_filament_id"),
                 data.get("poids_total_g", 0.0), data.get("temps_impression_h", 0.0),
                 data.get("temps_finition_h", 0.0), data.get("cout_matiere", 0.0),
                 data.get("cout_machine", 0.0), data.get("cout_electrique", 0.0),
                 data.get("cout_emballage", 0.0), data.get("cout_divers", 0.0),
+                data.get("cout_fournitures", 0.0),
                 data.get("montant_main_oeuvre", 0.0), data.get("cout_base", 0.0),
                 data.get("prix_ht_plancher", 0.0), data.get("prix_conseille_ht", 0.0),
                 data.get("prix_conseille_ttc", 0.0), notes.strip(), json.dumps(data, ensure_ascii=False),

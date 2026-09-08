@@ -27,6 +27,7 @@ class PricingInputs:
     divers: float = 0.0             # frais divers forfaitaires
     marge_cible_pct: float = 0.0    # marge cible, en % du prix de vente final
     tva_pct: float = 0.0            # TVA, en % (0 = désactivée / non applicable)
+    fournitures: float = 0.0        # vis, colle et autres consommables propres à l'objet
 
 
 @dataclass
@@ -37,6 +38,7 @@ class PricingResult:
     cout_module_filament: float
     cout_emballage: float
     cout_divers: float
+    cout_fournitures: float
     montant_main_oeuvre: float
     cout_base: float          # somme des coûts, hors charges et marge
     prix_ht_plancher: float   # prix qui couvre juste les coûts + charges sociales (marge = 0)
@@ -74,6 +76,7 @@ def calculer(i: PricingInputs) -> PricingResult:
         + montant_main_oeuvre
         + i.emballage
         + i.divers
+        + i.fournitures
     )
 
     taux_charges = max(0.0, i.taux_charges_pct) / 100.0
@@ -96,6 +99,7 @@ def calculer(i: PricingInputs) -> PricingResult:
         cout_module_filament=cout_module_filament,
         cout_emballage=i.emballage,
         cout_divers=i.divers,
+        cout_fournitures=i.fournitures,
         montant_main_oeuvre=montant_main_oeuvre,
         cout_base=cout_base,
         prix_ht_plancher=prix_ht_plancher,

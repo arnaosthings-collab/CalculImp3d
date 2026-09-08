@@ -211,6 +211,11 @@ class CalculatorTab(QWidget):
         self.btn_save_object = QPushButton(lang.tr("calc.btn_save_object"))
         self.btn_save_object.clicked.connect(self._save_object)
         main_layout.addWidget(self.btn_save_object)
+        self.fournitures = ParamField()
+        self.fournitures.setPlaceholderText(lang.tr("calc.placeholder_fournitures"))
+        fournitures_layout = QFormLayout()
+        fournitures_layout.addRow(lang.tr("calc.label_fournitures"), self.fournitures)
+        main_layout.addLayout(fournitures_layout)
         # Toggle multicouleur
         self.cb_multicolor = QCheckBox(lang.tr("calc.multicolor_checkbox"))
         self.cb_multicolor.stateChanged.connect(self._on_multicolor_toggled)
@@ -368,6 +373,7 @@ class CalculatorTab(QWidget):
             ("montant_main_oeuvre", lang.tr("calc.row_finition")),
             ("cout_emballage", lang.tr("calc.row_emballage")),
             ("cout_divers", lang.tr("calc.row_divers")),
+            ("cout_fournitures", lang.tr("calc.row_fournitures")),
             ("cout_base", lang.tr("calc.row_total")),
             ("montant_charges", lang.tr("calc.row_charges")),
             ("prix_ht_plancher", lang.tr("calc.row_prix_plancher")),
@@ -426,6 +432,7 @@ class CalculatorTab(QWidget):
                   self.taux_main_oeuvre, self.emballage, self.divers,
                   self.charges_pct, self.marge_pct, self.tva_pct):
             w.textChanged.connect(self._recalculer)
+            self.fournitures.textChanged.connect(self._recalculer)
         self.temps_impression.durationChanged.connect(self._recalculer)
         self.temps_finition.durationChanged.connect(self._recalculer)
 
@@ -595,10 +602,11 @@ class CalculatorTab(QWidget):
             "tva_pct": self.tva_pct.value(),
             "emballage": self.emballage.value(),
             "divers": self.divers.value(),
+            "fournitures": self.fournitures.value(),
             "composition": composition,
             **{key: getattr(result, key) for key in (
                 "cout_matiere", "cout_machine", "cout_electrique", "cout_emballage",
-                "cout_divers", "montant_main_oeuvre", "cout_base", "prix_ht_plancher",
+                "cout_divers", "cout_fournitures", "montant_main_oeuvre", "cout_base", "prix_ht_plancher",
                 "prix_conseille_ht", "prix_conseille_ttc",
             )},
         }
@@ -630,6 +638,7 @@ class CalculatorTab(QWidget):
                 conso_module_filament_kw=self._current_module_consumption(), prix_kwh=self.prix_kwh.value(),
                 taux_main_oeuvre_h=self.taux_main_oeuvre.value(), taux_charges_pct=self.charges_pct.value(),
                 emballage=self.emballage.value(), divers=self.divers.value(), marge_cible_pct=self.marge_pct.value(),
+                fournitures=self.fournitures.value(),
                 tva_pct=self.tva_pct.value(),
             )
             self.prix_haut_lbl.setVisible(has_catalogue)
@@ -643,6 +652,7 @@ class CalculatorTab(QWidget):
                 conso_module_filament_kw=self._current_module_consumption(), prix_kwh=self.prix_kwh.value(),
                 taux_main_oeuvre_h=self.taux_main_oeuvre.value(), taux_charges_pct=self.charges_pct.value(),
                 emballage=self.emballage.value(), divers=self.divers.value(), marge_cible_pct=self.marge_pct.value(),
+                fournitures=self.fournitures.value(),
                 tva_pct=self.tva_pct.value(),
             )
             self.prix_haut_lbl.setVisible(f is not None and f.prix_bobine_catalogue is not None)
