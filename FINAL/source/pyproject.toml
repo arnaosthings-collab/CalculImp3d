@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "calculimp3d"
+version = "0.1.0"
+description = "Calculateur de prix pour impression 3D"
+readme = "README.txt"
+authors = [
+    { name = "ARNAO'sThings", email = "arnaosthings@gmail.com" },
+]
+requires-python = ">=3.11"
+dependencies = [
+    "pyside6==6.11.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "coverage>=7.15.4",
+    "pyinstaller>=6.22.2",
+]
+
+[tool.setuptools]
+py-modules = ["appV1", "database", "lang", "pricing", "theme"]

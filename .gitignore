@@ -1,0 +1,31 @@
+# Environments and Python caches
+.venv/
+__pycache__/
+*.py[cod]
+
+# Build and packaging artifacts
+build/
+dist/
+*.egg-info/
+
+# IDE and local workspace settings
+.idea/
+.vscode/
+
+# User databases and local identifiers
+print3d_calc.db
+identifier.sqlite
+
+# Historical backups and local archives
+BACKUP/
+*.bak
+*.bak2
+*.bak3
+*.ba
+*.rar
+*.zip
+
+# Local exports and screenshots
+filaments.csv
+filaments2.csv
+screenshot_*.png
