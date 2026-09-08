@@ -211,6 +211,13 @@ FALLBACK_FR = {
     'objects.detail_parameters': 'Paramètres enregistrés',
     'objects.detail_composition': 'Composition',
     'common.close': 'Fermer',
+    'calc.multicolor_checkbox': '🎨 Objet multicouleur',
+    'calc.table_mat': 'Matière',
+    'calc.table_couleur': 'Couleur',
+    'calc.table_poids': 'Poids (g)',
+    'calc.table_cout': 'Coût',
+    'calc.btn_add_composition': '➕ Ajouter',
+    'calc.btn_remove_composition': '➖ Retirer sélection',
 }
 
 
@@ -377,6 +384,13 @@ FALLBACK_EN = {
     'objects.detail_parameters': 'Saved parameters',
     'objects.detail_composition': 'Composition',
     'common.close': 'Close',
+    'calc.multicolor_checkbox': '🎨 Multicolor object',
+    'calc.table_mat': 'Material',
+    'calc.table_couleur': 'Color',
+    'calc.table_poids': 'Weight (g)',
+    'calc.table_cout': 'Cost',
+    'calc.btn_add_composition': '➕ Add item',
+    'calc.btn_remove_composition': '➖ Remove selection',
 }
 
 

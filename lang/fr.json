@@ -54,7 +54,6 @@
   "calc.label_tva_pct": "TVA (%, 0 = désactivée)",
   "calc.msg_saved_text": "Ces taux sont maintenant vos valeurs par défaut.",
   "calc.msg_saved_title": "Enregistré",
-  "calc.multicolor_checkbox": " Objet multicouleur",
   "calc.no_filament": "(aucun filament — onglet Filaments)",
   "calc.no_filament_module": "Aucun module",
   "calc.placeholder_poids": "ex: 25.4",
