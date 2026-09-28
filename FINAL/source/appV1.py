@@ -166,13 +166,13 @@ class FilamentModuleDialog(QDialog):
 
 
 class PrintedObjectDialog(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, name="", notes="", editing=False):
         super().__init__(parent)
-        self.setWindowTitle(lang.tr("dialog.object.title"))
+        self.setWindowTitle(lang.tr("objects.dialog_edit_title") if editing else lang.tr("dialog.object.title"))
         layout = QFormLayout(self)
-        self.name = QLineEdit()
+        self.name = QLineEdit(name)
         self.name.setPlaceholderText(lang.tr("dialog.object.placeholder_name"))
-        self.notes = QTextEdit()
+        self.notes = QTextEdit(notes)
         self.notes.setPlaceholderText(lang.tr("dialog.object.placeholder_notes"))
         self.notes.setMinimumHeight(120)
         layout.addRow(lang.tr("dialog.object.label_name"), self.name)
@@ -249,8 +249,6 @@ class CalculatorTab(QWidget):
 
         f_single.addRow(lang.tr("calc.label_matiere"), self.matiere_combo)
         f_single.addRow(lang.tr("calc.label_couleur"), self.couleur_combo)
-        f_single.addRow(lang.tr("calc.label_imprimante"), self.imprimante_combo)
-        f_single.addRow(lang.tr("calc.label_module_filament"), self.module_filament_combo)
         f_single.addRow(lang.tr("calc.label_poids"), self.poids)
 
         # Ajout de w_single au stack (c'est le "gardien" de la mémoire des widgets ici)
@@ -339,11 +337,18 @@ class CalculatorTab(QWidget):
         f_marge.addRow(lang.tr("calc.label_marge_pct"), self.marge_pct)
         f_marge.addRow(lang.tr("calc.label_tva_pct"), self.tva_pct)
         grp_marge.setLayout(f_marge)
+        grp_equipment = QGroupBox(lang.tr("calc.group_equipment"))
+        f_equipment = QFormLayout(grp_equipment)
+        f_equipment.addRow(lang.tr("calc.label_imprimante"), self.imprimante_combo)
+        f_equipment.addRow(lang.tr("calc.label_module_filament"), self.module_filament_combo)
         if self.parameters_host is None:
+            f_single.addRow(lang.tr("calc.label_imprimante"), self.imprimante_combo)
+            f_single.addRow(lang.tr("calc.label_module_filament"), self.module_filament_combo)
             left.addWidget(grp_couts)
             left.addWidget(grp_marge)
         else:
             parameters_layout = QVBoxLayout(self.parameters_host)
+            parameters_layout.addWidget(grp_equipment)
             parameters_layout.addWidget(grp_couts)
             parameters_layout.addWidget(grp_marge)
 
@@ -1207,8 +1212,60 @@ class PrintedObjectsTab(QWidget):
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.cellDoubleClicked.connect(self._show_details)
+        actions = QHBoxLayout()
+        self.edit_button = QPushButton(lang.tr("objects.btn_edit"))
+        self.edit_button.setObjectName("Secondary")
+        self.edit_button.clicked.connect(self._edit_selected)
+        self.delete_button = QPushButton(lang.tr("objects.btn_delete"))
+        self.delete_button.setObjectName("Danger")
+        self.delete_button.clicked.connect(self._delete_selected)
+        actions.addWidget(self.edit_button)
+        actions.addWidget(self.delete_button)
+        actions.addStretch()
+        layout.addLayout(actions)
         layout.addWidget(self.table)
         self._refresh()
+
+    def _selected_object(self):
+        row = self.table.currentRow()
+        if row < 0 or self.table.item(row, 0) is None:
+            QMessageBox.information(
+                self, lang.tr("common.no_selection_title"),
+                lang.tr("objects.no_selection_text"),
+            )
+            return None
+        object_id = self.table.item(row, 0).data(Qt.UserRole)
+        return next((obj for obj in db.get_printed_objects() if obj["id"] == object_id), None)
+
+    def _edit_selected(self):
+        item = self._selected_object()
+        if item is None:
+            return
+        dialog = PrintedObjectDialog(self, item.get("nom", ""), item.get("notes", ""), editing=True)
+        if dialog.exec() != QDialog.Accepted:
+            return
+        name = dialog.name.text().strip()
+        if not name:
+            QMessageBox.warning(
+                self, lang.tr("dialog.object.missing_name_title"),
+                lang.tr("dialog.object.missing_name_text"),
+            )
+            return
+        db.update_printed_object(item["id"], name, dialog.notes.toPlainText())
+        self._refresh()
+
+    def _delete_selected(self):
+        item = self._selected_object()
+        if item is None:
+            return
+        reply = QMessageBox.question(
+            self, lang.tr("common.confirm_delete_title"),
+            lang.tr("objects.confirm_delete_text", name=item["nom"]),
+            QMessageBox.Yes | QMessageBox.No,
+        )
+        if reply == QMessageBox.Yes:
+            db.delete_printed_object(item["id"])
+            self._refresh()
 
     def _refresh(self):
         objects = db.get_printed_objects()

@@ -338,6 +338,33 @@ def get_printed_objects() -> list[dict]:
     return objects
 
 
+def update_printed_object(object_id: int, name: str, notes: str) -> None:
+    """Update the editable descriptive fields of a saved object."""
+    conn = get_connection()
+    try:
+        conn.execute(
+            "UPDATE objets_imprimes SET nom = ?, notes = ? WHERE id = ?",
+            (name.strip(), notes.strip(), object_id),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def delete_printed_object(object_id: int) -> None:
+    """Delete a saved object and its composition, including on older databases."""
+    conn = get_connection()
+    try:
+        conn.execute("DELETE FROM compositions_objet WHERE objet_id = ?", (object_id,))
+        conn.execute("DELETE FROM objets_imprimes WHERE id = ?", (object_id,))
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
 @dataclass
 class Printer:
     id: int
