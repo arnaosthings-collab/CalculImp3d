@@ -26,6 +26,7 @@ exe = EXE(
     a.datas,
     [],
     name='Calculateur3D',
+    version='version_info.txt',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
